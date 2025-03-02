@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flood Fill Visualization</title>
+    <style>
+      canvas {
+        border: 2px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Click on a land cell (1) to fill the island!</h2>
+    <canvas id="canvas"></canvas>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      const gridSize = 6;
+      const cellSize = 60;
+      canvas.width = gridSize * cellSize;
+      canvas.height = gridSize * cellSize;
+
+      let grid = [
+        [1, 1, 0, 1, 0, 0],
+        [1, 0, 0, 0, 0, 1],
+        [1, 0, 1, 0, 0, 1],
+        [0, 0, 1, 1, 0, 1],
+        [1, 0, 0, 0, 1, 1],
+        [1, 1, 0, 0, 1, 1],
+      ];
+
+      let colorMap = {}; // Store colors for filled regions
+      let colorCount = 2; // Unique color IDs (start at 2)
+
+      function drawGrid() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < gridSize; i++) {
+          for (let j = 0; j < gridSize; j++) {
+            ctx.fillStyle =
+              grid[i][j] === 0 ? 'white' : colorMap[grid[i][j]] || 'lightgray';
+            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            ctx.strokeStyle = 'black';
+            ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+
+      function getRandomColor() {
+        return `hsl(${Math.random() * 360}, 100%, 70%)`;
+      }
+
+      function floodFill(r, c, originalColor, newColor) {
+        if (
+          r < 0 ||
+          r >= gridSize ||
+          c < 0 ||
+          c >= gridSize ||
+          grid[r][c] !== originalColor
+        )
+          return;
+
+        grid[r][c] = newColor;
+        floodFill(r + 1, c, originalColor, newColor);
+        floodFill(r - 1, c, originalColor, newColor);
+        floodFill(r, c + 1, originalColor, newColor);
+        floodFill(r, c - 1, originalColor, newColor);
+      }
+
+      canvas.addEventListener('click', (e) => {
+        let col = Math.floor(e.offsetX / cellSize);
+        let row = Math.floor(e.offsetY / cellSize);
+
+        if (grid[row][col] === 1) {
+          let newColor = colorCount++;
+          colorMap[newColor] = getRandomColor();
+          floodFill(row, col, 1, newColor);
+          drawGrid();
+        }
+      });
+
+      drawGrid();
+    </script>
+  </body>
+</html>
