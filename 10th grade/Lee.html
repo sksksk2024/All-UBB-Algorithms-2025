@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lee Algorithm Visualization</title>
+    <style>
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(10, 30px);
+        gap: 2px;
+      }
+      .cell {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+      .start {
+        background: green;
+      }
+      .end {
+        background: red;
+      }
+      .wall {
+        background: black;
+      }
+      .path {
+        background: yellow;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Click to set start, end, and walls. Then click "Find Path".</h3>
+    <button onclick="findPath()">Find Path</button>
+    <div class="grid" id="grid"></div>
+    <p id="result"></p>
+
+    <script>
+      const gridSize = 10;
+      let grid = Array.from({ length: gridSize }, () =>
+        Array(gridSize).fill(0)
+      );
+      let start = null,
+        end = null;
+      let pathFound = false;
+
+      function createGrid() {
+        const gridContainer = document.getElementById('grid');
+        gridContainer.innerHTML = ''; // Clear previous grid
+        pathFound = false; // Reset path state
+
+        for (let i = 0; i < gridSize; i++) {
+          for (let j = 0; j < gridSize; j++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.dataset.row = i;
+            cell.dataset.col = j;
+            cell.addEventListener('click', () => handleClick(i, j, cell));
+            gridContainer.appendChild(cell);
+          }
+        }
+      }
+
+      function handleClick(i, j, cell) {
+        if (pathFound) return; // ❌ Prevent placing walls after finding a path
+        if (!start) {
+          start = [i, j];
+          cell.classList.add('start');
+          grid[i][j] = 2;
+        } else if (!end) {
+          end = [i, j];
+          cell.classList.add('end');
+          grid[i][j] = 3;
+        } else {
+          if (grid[i][j] === 0) {
+            grid[i][j] = 1;
+            cell.classList.add('wall');
+          }
+        }
+      }
+
+      function findPath() {
+        if (!start || !end) return alert('Select a start and an end!');
+
+        clearPreviousPath(); // ✅ Remove old paths before running again
+
+        let steps = leeAlgorithm(grid, start[0], start[1], end[0], end[1]);
+        document.getElementById('result').innerText =
+          steps === -1 ? 'No path found!' : `Shortest path: ${steps} steps`;
+
+        pathFound = true; // ✅ Prevent further editing
+      }
+
+      function clearPreviousPath() {
+        document
+          .querySelectorAll('.path')
+          .forEach((cell) => cell.classList.remove('path'));
+      }
+
+      function leeAlgorithm(grid, sr, sc, dr, dc) {
+        let directions = [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ];
+        let queue = [[sr, sc]];
+        let parent = Array.from({ length: gridSize }, () =>
+          Array(gridSize).fill(null)
+        );
+        let visited = Array.from({ length: gridSize }, () =>
+          Array(gridSize).fill(false)
+        );
+
+        visited[sr][sc] = true;
+        grid[sr][sc] = 4;
+        let steps = 0;
+
+        while (queue.length) {
+          let size = queue.length;
+          for (let i = 0; i < size; i++) {
+            let [r, c] = queue.shift();
+            if (r === dr && c === dc) {
+              drawPath(parent, sr, sc, dr, dc);
+              return steps;
+            }
+            for (let [dr, dc] of directions) {
+              let nr = r + dr,
+                nc = c + dc;
+              if (
+                nr >= 0 &&
+                nr < gridSize &&
+                nc >= 0 &&
+                nc < gridSize &&
+                !visited[nr][nc] &&
+                grid[nr][nc] !== 1
+              ) {
+                queue.push([nr, nc]);
+                visited[nr][nc] = true;
+                parent[nr][nc] = [r, c];
+              }
+            }
+          }
+          steps++;
+        }
+        return -1;
+      }
+      function drawPath(parent, sr, sc, dr, dc) {
+        let [r, c] = [dr, dc];
+        while (parent[r][c]) {
+          let [pr, pc] = parent[r][c];
+
+          // ✅ Prevents coloring the start square
+          if (pr !== sr || pc !== sc) {
+            document
+              .querySelector(`[data-row="${pr}"][data-col="${pc}"]`)
+              .classList.add('path');
+          }
+
+          [r, c] = [pr, pc];
+        }
+      }
+
+      createGrid();
+    </script>
+  </body>
+</html>
