@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Factorial Permutations</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+      input,
+      button {
+        margin: 10px;
+        padding: 8px;
+        font-size: 16px;
+      }
+      .output {
+        margin-top: 20px;
+        white-space: pre-line;
+        font-weight: bold;
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+      }
+      #progress {
+        font-size: 18px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Generate Permutations (n!)</h2>
+    <label for="numInput">Enter n: </label>
+    <input type="number" id="numInput" min="1" max="10" value="3" />
+    <button onclick="startGeneration()">Generate</button>
+    <button onclick="stopGeneration()" style="background: red; color: white">
+      Stop
+    </button>
+    <div id="progress"></div>
+    <div class="output" id="output"></div>
+
+    <script>
+      let stopFlag = false;
+
+      function startGeneration() {
+        let n = parseInt(document.getElementById('numInput').value);
+        let sol = new Array(n);
+        let F = new Array(n + 1).fill(0);
+        let outputDiv = document.getElementById('output');
+        let progressDiv = document.getElementById('progress');
+        outputDiv.innerHTML = ''; // Clear previous results
+        stopFlag = false;
+        let count = 0;
+
+        function display() {
+          if (stopFlag) return;
+          count++;
+          if (count % 100 === 0) {
+            progressDiv.innerText = `Generated ${count} permutations...`;
+          }
+          outputDiv.innerHTML += sol.join(' ') + '<br>';
+          if (count % 500 === 0) {
+            setTimeout(() => {}, 0); // Let the browser breathe
+          }
+        }
+
+        function backtracking(pos) {
+          if (stopFlag) return;
+          for (let i = 1; i <= n; i++) {
+            if (F[i] === 0) {
+              F[i] = 1;
+              sol[pos - 1] = i;
+              if (pos === n) display();
+              else backtracking(pos + 1);
+              F[i] = 0; // Backtrack
+            }
+          }
+        }
+
+        setTimeout(() => {
+          backtracking(1);
+          progressDiv.innerText = `Done! Total: ${count} permutations`;
+        }, 0);
+      }
+
+      function stopGeneration() {
+        stopFlag = true;
+        document.getElementById('progress').innerText = 'Stopped!';
+      }
+    </script>
+  </body>
+</html>
