@@ -1,6 +1,6 @@
-# 🚀 Algorithms & Problem-Solving Journey
-- **[Course Projects]([course-folder](https://github.com/sksksk2024/sksksk-s-path-to-algorithms-mastery)/)** – More algorithms from the courses I follow.
+- **[Brad Traversy Course](https://github.com/sksksk2024/sksksk-s-path-to-algorithms-mastery/)** – More algorithms from the courses I follow.
 
+# 🚀 Algorithms & Problem-Solving Journey
 Over the past **two months**, I’ve **mastered** the essential algorithms and data structures needed for **university admissions, job interviews, and real-world problem-solving**. This repository is a collection of my **solutions, optimizations, and explorations** into various algorithmic challenges.  
 
 ## 🎯 **What This Covers**  
